@@ -32,6 +32,26 @@ function readCache(key) {
     }
 }
 
+// Escapes text that came back from the LLM before dropping it into
+// innerHTML -- it's grounded in real numbers by the server-side prompt,
+// but it's still model-generated free text, not markup we wrote ourselves.
+function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Turns a block of LLM-written prose into one <p> per line/blank-line-
+// separated paragraph, instead of dumping it into a single run-on block.
+function buildLlmParagraphsHtml(text) {
+    return text
+        .split(/\n+/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((p) => `<p>${escapeHtml(p)}</p>`)
+        .join("");
+}
+
 function renderEmptyState(container) {
     container.innerHTML = `
         <div class="empty-state">
@@ -43,8 +63,14 @@ function renderEmptyState(container) {
 
 // ---- Headline (bottom line, stated first) ----
 
-function buildHeadline(regional, mc) {
+function buildHeadline(regional, mc, llmHeadline) {
     const dis = (regional && regional.disruption) || (mc && mc.disruption);
+    if (llmHeadline) {
+        return {
+            eyebrow: dis ? "Scenario result" : "Baseline run",
+            text: llmHeadline,
+        };
+    }
     if (!dis) {
         return {
             eyebrow: "Baseline run",
@@ -66,7 +92,10 @@ function buildHeadline(regional, mc) {
 
 // ---- The story: walk the material through the chain, stage by stage ----
 
-function buildStoryHtml(chainFlow) {
+function buildStoryHtml(chainFlow, llmStory) {
+    if (llmStory) {
+        return `<div class="story-flow">${buildLlmParagraphsHtml(llmStory)}</div>`;
+    }
     if (!chainFlow || !Array.isArray(chainFlow.nodes) || chainFlow.nodes.length === 0) {
         return `<p style="color: var(--text-muted); font-size: 0.85rem;">Chain-flow data isn't available for this run.</p>`;
     }
@@ -118,18 +147,23 @@ function buildStoryHtml(chainFlow) {
 
 // ---- Why we ran it many times (Monte Carlo, in plain terms) ----
 
-function buildRiskHtml(mc) {
+function buildRiskHtml(mc, llmRisk) {
     if (!mc || !mc.summary) {
         return `<p style="color: var(--text-muted); font-size: 0.85rem;">Risk-analysis data isn't available for this run.</p>`;
     }
     const s = mc.summary;
-    let html = `<p>
-        A single simulation could just be luck -- good or bad. So instead of running this scenario once, the model
-        replayed it ${mc.n_trials || "many"} times, each time with different, realistic random demand. That turns
-        one guess into a range: how this scenario plays out most of the time, and how bad the unlucky cases get.
-    </p>`;
-    if (mc.narrative) {
-        html += `<p>${mc.narrative}</p>`;
+    let html = "";
+    if (llmRisk) {
+        html += buildLlmParagraphsHtml(llmRisk);
+    } else {
+        html += `<p>
+            A single simulation could just be luck -- good or bad. So instead of running this scenario once, the model
+            replayed it ${mc.n_trials || "many"} times, each time with different, realistic random demand. That turns
+            one guess into a range: how this scenario plays out most of the time, and how bad the unlucky cases get.
+        </p>`;
+        if (mc.narrative) {
+            html += `<p>${mc.narrative}</p>`;
+        }
     }
     html += `<div class="takeaway-grid">
         <div class="takeaway-tile">
@@ -157,7 +191,7 @@ function buildRiskHtml(mc) {
 
 const STATUS_COLORS_HEX = { green: "#28C76F", yellow: "#FF9F43", red: "#EA5455" };
 
-function buildRegionsHtml(regional) {
+function buildRegionsHtml(regional, llmRegional) {
     if (!regional || !Array.isArray(regional.regions)) {
         return `<p style="color: var(--text-muted); font-size: 0.85rem;">Regional data isn't available for this run.</p>`;
     }
@@ -166,7 +200,9 @@ function buildRegionsHtml(regional) {
     const strained = regional.regions.filter((r) => r.status !== "green");
 
     let html = "";
-    if (strained.length === 0) {
+    if (llmRegional) {
+        html += buildLlmParagraphsHtml(llmRegional);
+    } else if (strained.length === 0) {
         html += `<p>Every region is still meeting its service target in this run -- nobody is visibly short of supply.</p>`;
     } else {
         html += `<p>
@@ -190,13 +226,20 @@ function render() {
     const regional = readCache("ltwin_regional");
     const mc = readCache("ltwin_monte_carlo");
     const chainFlow = readCache("ltwin_chain_flow");
+    // Optional LLM-generated explanation, stashed by supply-chain.js from
+    // data/llm_explanation.json. `available` is only true when the server
+    // actually had an OpenAI key configured and the call succeeded for this
+    // scenario run -- otherwise this is null/unavailable and every section
+    // below falls back to its existing deterministic text exactly as before.
+    const llm = readCache("ltwin_llm_explanation");
+    const llmReady = !!(llm && llm.available);
 
     if (!regional && !mc && !chainFlow) {
         renderEmptyState(container);
         return;
     }
 
-    const headline = buildHeadline(regional, mc);
+    const headline = buildHeadline(regional, mc, llmReady ? llm.headline : null);
     container.innerHTML = `
         <div class="headline-card">
             <div class="eyebrow">${headline.eyebrow}</div>
@@ -205,17 +248,17 @@ function render() {
 
         <div class="card story-section">
             <h3>The Story: Following the Material Through the Chain</h3>
-            ${buildStoryHtml(chainFlow)}
+            ${buildStoryHtml(chainFlow, llmReady ? llm.story : null)}
         </div>
 
         <div class="card story-section">
             <h3>Why We Trust This Number</h3>
-            ${buildRiskHtml(mc)}
+            ${buildRiskHtml(mc, llmReady ? llm.risk : null)}
         </div>
 
         <div class="card story-section">
             <h3>Where It Shows Up</h3>
-            ${buildRegionsHtml(regional)}
+            ${buildRegionsHtml(regional, llmReady ? llm.regional : null)}
         </div>
 
         <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 0.5rem;">

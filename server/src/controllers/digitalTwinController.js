@@ -1,6 +1,7 @@
 const { execFile } = require("child_process");
 const path = require("path");
 const fs = require("fs");
+const { generateExplanations } = require("../services/llmExplain.service");
 
 // This file lives at server/src/controllers/, so three levels up is the
 // repo root -- where `python -m lithium_twin.X` must be run from for the
@@ -8,6 +9,10 @@ const fs = require("fs");
 const REPO_ROOT = path.resolve(__dirname, "..", "..", "..");
 const CLIENT_DATA_DIR = path.join(REPO_ROOT, "client", "data");
 const MODEL_OVERVIEW_JSON = path.join(CLIENT_DATA_DIR, "model_overview.json");
+const REGIONAL_HEALTH_JSON = path.join(CLIENT_DATA_DIR, "regional_health.json");
+const MONTE_CARLO_JSON = path.join(CLIENT_DATA_DIR, "monte_carlo_results.json");
+const CHAIN_FLOW_JSON = path.join(CLIENT_DATA_DIR, "chain_flow.json");
+const LLM_EXPLANATION_JSON = path.join(CLIENT_DATA_DIR, "llm_explanation.json");
 
 // Must point at the Python interpreter that has the lithium_twin project's
 // dependencies installed (simpy, scipy, pulp, networkx, openpyxl...) --
@@ -39,6 +44,34 @@ function loadModelOverview() {
     throw err;
   }
   return JSON.parse(fs.readFileSync(MODEL_OVERVIEW_JSON, "utf-8"));
+}
+
+function readJsonIfExists(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+}
+
+// Best-effort: generates the LLM-based plain-English explanation from the
+// three JSON snapshots the Python CLIs just wrote, and caches it to
+// llm_explanation.json for the client to read alongside them. Never
+// throws -- a failure here (no API key, network error, bad model output)
+// should never fail the scenario run itself, since the scenario results
+// are already valid and complete without this step. The client falls
+// back to its own deterministic, template-based explanations whenever
+// this file is missing or has `available: false`.
+async function refreshLlmExplanation() {
+  const payload = { generated_at: new Date().toISOString() };
+  try {
+    const regional = readJsonIfExists(REGIONAL_HEALTH_JSON);
+    const monteCarlo = readJsonIfExists(MONTE_CARLO_JSON);
+    const chainFlow = readJsonIfExists(CHAIN_FLOW_JSON);
+    const fields = await generateExplanations({ regional, monteCarlo, chainFlow });
+    Object.assign(payload, fields, { available: true });
+  } catch (err) {
+    console.error("[llm-explain] falling back to template explanations:", err.message);
+    Object.assign(payload, { available: false, reason: err.message });
+  }
+  fs.writeFileSync(LLM_EXPLANATION_JSON, JSON.stringify(payload, null, 2), "utf-8");
 }
 
 // Validates a scenario request against the REAL node/arc ids in the live
@@ -172,6 +205,12 @@ async function runScenario(req, res, next) {
         "--weeks", String(v.weeksNum), "--n-trials", String(v.nTrialsNum), ...disruptionFlags,
       ]),
     ]);
+
+    // Runs after the three snapshots above are on disk, so it has fresh
+    // data to summarize. Awaited so llm_explanation.json is ready by the
+    // time the client re-fetches results, but its own failure is caught
+    // internally and never reaches this request's response.
+    await refreshLlmExplanation();
 
     res.json({
       status: "ok",
