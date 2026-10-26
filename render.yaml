@@ -5,7 +5,7 @@
 # once in the dashboard, never committed here.
 services:
   - type: web
-    name: ev-route-optimizer
+    name: trace-li
     runtime: docker
     dockerfilePath: ./server/Dockerfile
     dockerContext: .
