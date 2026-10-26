@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-10-26T11:09:14.809900+00:00",
+  "generated_at": "2026-10-26T11:36:31.695906+00:00",
   "weeks_simulated": 104,
   "seed": 42,
   "service_level_target": 0.95,
-  "overall_fill_rate": 0.4969372668449895,
-  "overall_fill_rate_during_disruption": 0.26398105855763976,
+  "overall_fill_rate": 0.4375226927127203,
+  "overall_fill_rate_during_disruption": 0.11734431858726212,
   "disruption": {
-    "label": "india-pack-assembly->india-oem",
+    "label": "china-cell-mfg->india-pack-assembly",
     "target_type": "arc",
     "parameter": "capacity_lce",
-    "reduction_pct": 0.9,
-    "start_week": 30,
-    "duration_weeks": 60
+    "reduction_pct": 0.98,
+    "start_week": 45,
+    "duration_weeks": 55
   },
   "regions": [
     {
@@ -21,7 +21,7 @@
       "lat": 26.9124,
       "lon": 75.7873,
       "demand_share": 0.21551724137931033,
-      "fill_rate": 0.49790550037310866,
+      "fill_rate": 0.44055752144078436,
       "status": "red"
     },
     {
@@ -31,7 +31,7 @@
       "lat": 26.209065,
       "lon": 73.027268,
       "demand_share": 0.1810344827586207,
-      "fill_rate": 0.4925150294461809,
+      "fill_rate": 0.43043887404762543,
       "status": "red"
     },
     {
@@ -41,7 +41,7 @@
       "lat": 24.575043,
       "lon": 73.690237,
       "demand_share": 0.1336206896551724,
-      "fill_rate": 0.5034627964998759,
+      "fill_rate": 0.446343444719571,
       "status": "red"
     },
     {
@@ -51,7 +51,7 @@
       "lat": 26.407877,
       "lon": 74.621291,
       "demand_share": 0.1206896551724138,
-      "fill_rate": 0.49409540299909954,
+      "fill_rate": 0.4317333952145578,
       "status": "red"
     },
     {
@@ -61,7 +61,7 @@
       "lat": 28.009432,
       "lon": 73.284382,
       "demand_share": 0.10775862068965517,
-      "fill_rate": 0.491981242522987,
+      "fill_rate": 0.4295546929655977,
       "status": "red"
     },
     {
@@ -71,7 +71,7 @@
       "lat": 25.241594,
       "lon": 76.882369,
       "demand_share": 0.15517241379310345,
-      "fill_rate": 0.49993614863902236,
+      "fill_rate": 0.44222695864192724,
       "status": "red"
     },
     {
@@ -81,7 +81,7 @@
       "lat": 27.55,
       "lon": 76.63,
       "demand_share": 0.08620689655172414,
-      "fill_rate": 0.4978912255592756,
+      "fill_rate": 0.43986195325836397,
       "status": "red"
     }
   ]

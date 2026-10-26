@@ -3,8 +3,9 @@
 // One file, one source of truth for the three sections: Analyze (the
 // digital twin's scenario tool), Theory (how the model works), and
 // Logistics (the original EV route optimizer, now at route.html/map.html).
-// The brand mark on the left always links to index.html -- the site's
-// home page -- so it doubles as the "return home" icon every page needs.
+// The brand mark on the left also links to index.html -- the site's home
+// page -- and a dedicated Home icon sits in the same white nav strip,
+// right after the Logistics tab, as a second, explicit way back home.
 (function () {
     const PAGES = [
         { href: "supply-chain.html", label: "Analyze", match: ["supply-chain.html", "explain.html"] },
@@ -28,23 +29,29 @@
                     <span class="top-nav-brand-mark">Li</span>
                     <span class="top-nav-brand-text">Lithium Supply Chain Digital Twin</span>
                 </a>
-                <nav class="top-nav-links">${links}</nav>
+                <div class="top-nav-right">
+                    <nav class="top-nav-links">${links}</nav>
+                    <a href="index.html" class="top-nav-home-icon" title="Home">&#8962;</a>
+                </div>
             </header>
         `;
     }
 
-    // Sitewide "Previous" link -- always returns to the home page
-    // (index.html), matching the wireframe's bottom-left "Previous"
-    // button on every section page. A plain link, not browser-history
-    // back, so it behaves the same way no matter how the person
-    // actually arrived here. Any page can opt in by including an empty
-    // <div id="back-link-root"> near the bottom of its content; the
-    // home page itself simply doesn't include that div, since it has
-    // nowhere further back to go.
+    // Bottom-left "Previous" box -- follows each page's actual navigation
+    // flow, not a generic "go home" link (the nav strip's Home icon above
+    // covers that). A page reached by drilling into a section (e.g.
+    // map.html from route.html, explain.html from supply-chain.html)
+    // points back to the specific page that led here. The entry page of
+    // each section (supply-chain.html, how-it-works.html, route.html) has
+    // nothing to go back to within its own flow, so it simply doesn't
+    // include a <div id="back-link-root"> at all. Pages that do include
+    // it set the destination with a data-back-href attribute, e.g.
+    // <div id="back-link-root" data-back-href="route.html">.
     function injectBackLink() {
         const backRoot = document.getElementById("back-link-root");
         if (!backRoot) return;
-        backRoot.innerHTML = `<a href="index.html" class="back-link" id="back-link">&larr; Previous</a>`;
+        const dest = backRoot.dataset.backHref || "index.html";
+        backRoot.innerHTML = `<a href="${dest}" class="back-link" id="back-link">&larr; Previous</a>`;
     }
 
     // #top-nav-root always sits right after <body>, so it already exists

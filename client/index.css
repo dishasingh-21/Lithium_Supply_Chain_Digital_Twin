@@ -88,12 +88,39 @@ body {
     white-space: nowrap;
 }
 
+.top-nav-right {
+    display: flex;
+    align-items: center;
+}
+
 .top-nav-links {
     display: flex;
     gap: 0.25rem;
     background: var(--bg-main);
     padding: 0.25rem;
     border-radius: 999px;
+}
+
+/* Dedicated Home icon, placed right beside the Logistics tab in the same
+   white nav strip (not inside the Analyze/Theory/Logistics pill itself). */
+.top-nav-home-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-left: 0.6rem;
+    border-radius: 50%;
+    background: var(--bg-main);
+    color: var(--primary);
+    font-size: 1.1rem;
+    text-decoration: none;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+.top-nav-home-icon:hover {
+    background: var(--primary);
+    color: #fff;
 }
 
 .top-nav-link {
@@ -464,6 +491,11 @@ body {
     }
     .top-nav-links {
         gap: 0.1rem;
+    }
+    .top-nav-home-icon {
+        margin-left: 0.4rem;
+        width: 28px;
+        height: 28px;
     }
     .top-nav-link {
         padding: 0.45rem 0.75rem;
