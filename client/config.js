@@ -1,6 +1,14 @@
 // Single source of truth for where the backend API lives.
-// Local dev -> localhost:5000. Deployed -> set PROD_API_URL below to your
-// backend's public URL (must end in /api), e.g. "https://ev-route-api.onrender.com/api".
-const PROD_API_URL = "https://YOUR-BACKEND-URL/api";
-const isLocal = ["localhost", "127.0.0.1", ""].includes(window.location.hostname);
-window.API_BASE_URL = window.API_BASE_URL || (isLocal ? "http://localhost:5000/api" : PROD_API_URL);
+//
+// Deployed (combined Render service): server/src/app.js now serves this
+// client/ folder itself via express.static, so client and API are
+// same-origin in production -- a plain relative "/api" always resolves
+// correctly there, with no URL to hardcode or update on redeploy.
+//
+// Local dev: if you're opening this client through a separate dev server
+// (e.g. VS Code Live Server on :5500) rather than http://localhost:5000
+// itself, "/api" would resolve against :5500 and 404, so this keeps the
+// explicit localhost:5000 fallback for that one case.
+const isLocalDevServer = ["localhost", "127.0.0.1", ""].includes(window.location.hostname)
+  && window.location.port !== "5000";
+window.API_BASE_URL = window.API_BASE_URL || (isLocalDevServer ? "http://localhost:5000/api" : "/api");

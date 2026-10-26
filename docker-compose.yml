@@ -8,7 +8,13 @@ services:
       - mongo_data:/data/db
 
   api:
-    build: ./server
+    # Build context must be the repo root, not ./server: server/Dockerfile
+    # now bakes in lithium_twin/ and client/ as siblings of server/ (same
+    # layout the Render deploy uses), so it needs to see all three from
+    # the repo root, not just the server/ folder.
+    build:
+      context: .
+      dockerfile: server/Dockerfile
     container_name: ev_route_api
     depends_on:
       - mongo
@@ -21,9 +27,15 @@ services:
       AVG_SPEED_KMH: 60
       CHARGE_STOP_MINUTES: 30
       CLIENT_ORIGIN: "*"
-    volumes:
-      - ./server:/app
-      - /app/node_modules
+      # LLM_API_BASE_URL / LLM_API_KEY / LLM_MODEL: not set here on purpose --
+      # pass them via `docker compose --env-file server/.env up` or export
+      # them in your shell before `up` if you want AI explanations locally;
+      # omitting them just falls back to the deterministic template text.
+    # No bind-mount volumes: the old ./server:/app mount was for live-reload
+    # against just the server/ folder, but the image now spans server/ +
+    # lithium_twin/ + client/ together (and bakes model_overview.json at
+    # build time), so a partial mount would desync it from the image.
+    # Re-run `docker compose up --build` after editing any source file.
 
 volumes:
   mongo_data:

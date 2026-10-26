@@ -1,0 +1,25 @@
+# Never baked into any image, even for a stray local `docker build` --
+# Render's own git-based build wouldn't pick these up either, but this is
+# a second line of defense since Docker only respects .dockerignore, not
+# .gitignore.
+.git
+.gitignore
+server/.env
+server/.env.example
+.idea
+.vscode
+
+# Python/Node build + cache artifacts -- reinstalled fresh in the image
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+node_modules
+server/node_modules
+
+# Project-local scratch data not needed to run the deployed app
+CoordinateData
+Operations Research part
+README.md
+LICENSE
+*.log

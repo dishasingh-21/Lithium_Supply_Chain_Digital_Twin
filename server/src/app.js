@@ -3,6 +3,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
 const mongoose = require("mongoose");
+const path = require("path");
 
 const stationsRoutes = require("./routes/stations.routes");
 const recommendationsRoutes = require("./routes/recommendations.routes");
@@ -18,6 +19,16 @@ function createApp() {
   app.use(cors({ origin: process.env.CLIENT_ORIGIN || "*" }));
   app.use(express.json({ limit: "100kb" }));
   app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+
+  // Serves the static client (client/index.html, supply-chain.html, etc.,
+  // and the data/*.json snapshots the digital twin writes) from the same
+  // origin and process as the API -- this file lives at server/src/app.js,
+  // so two levels up is the repo root. Deployed together as one Render
+  // service, this is what lets the digital-twin's file-based JSON handoff
+  // (write to client/data/*.json, client fetches it back) keep working:
+  // both sides are reading/writing the same disk. GET "/" resolves to
+  // client/index.html automatically (express.static's default index file).
+  app.use(express.static(path.join(__dirname, "..", "..", "client")));
 
   app.get("/api/health", (req, res) => {
     const dbUp = mongoose.connection.readyState === 1;
