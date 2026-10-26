@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theory - Lithium Supply Chain Digital Twin</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        /* Same page shell as the rest of the site (var(--bg-main), cards,
+           var(--primary)) -- a single continuous page, no tabs. */
+        .tw-page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: calc(var(--header-height) + 1.5rem) 1.5rem 3rem;
+        }
+        .tw-hero {
+            margin-bottom: 2rem;
+        }
+        .tw-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+        .tw-hero h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.3px;
+        }
+        .tw-subtitle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            max-width: 680px;
+            margin-bottom: 1.25rem;
+        }
+        .tw-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--primary);
+            border: 1px solid rgba(0, 91, 113, 0.25);
+            background: rgba(0, 91, 113, 0.06);
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+        }
+        .tw-badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .tw-section {
+            margin-bottom: 2rem;
+        }
+        .tw-section p {
+            color: var(--text-main);
+            line-height: 1.8;
+            font-size: 0.92rem;
+            margin-bottom: 1rem;
+        }
+        .tw-section p strong { color: var(--primary); }
+        .tw-card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+        .tw-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-top: 2px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 1.1rem;
+            box-shadow: var(--shadow);
+        }
+        .tw-card-eyebrow {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+        .tw-card h4 {
+            color: var(--text-main);
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+        }
+        .tw-card p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .tw-callout {
+            background: #F8FAFC;
+            border-left: 3px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            line-height: 1.7;
+            margin: 1.25rem 0;
+        }
+        .tw-pipeline {
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            padding: 1.25rem 0.25rem;
+            gap: 0;
+        }
+        .tw-pipe-stage {
+            flex: 0 0 140px;
+            text-align: center;
+        }
+        .tw-pipe-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 0.5rem;
+            border-radius: 50%;
+            background: rgba(0, 91, 113, 0.08);
+            border: 1px solid rgba(0, 91, 113, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        .tw-pipe-stage .stage-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.15rem;
+        }
+        .tw-pipe-stage .stage-sub {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+        }
+        .tw-pipe-arrow {
+            flex: 0 0 32px;
+            color: var(--primary);
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .topo-strip {
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            padding: 1rem 0.25rem;
+            gap: 0;
+        }
+        .topo-card {
+            flex: 0 0 150px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.875rem;
+            box-shadow: var(--shadow);
+        }
+        .topo-type {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+        .topo-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            min-height: 2.2em;
+        }
+        .topo-stats {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+        .topo-stats strong { color: var(--primary); }
+        .topo-arrow {
+            flex: 0 0 60px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--border-color);
+            position: relative;
+        }
+        .topo-arrow-label {
+            display: block;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+        #policy-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            color: var(--text-main);
+            margin-top: 0.75rem;
+        }
+        #policy-table th, #policy-table td {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        #policy-table th {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .calib-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin: 1rem 0 0.5rem 0;
+        }
+        .dashboard-link {
+            display: inline-block;
+            margin-top: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <div id="top-nav-root"></div>
+    <script src="nav.js"></script>
+
+    <div class="app-container">
+    <div class="tw-page">
+        <div class="tw-hero">
+            <div class="tw-eyebrow">Digital Twin Research</div>
+            <h1>Lithium Supply Chain Digital Twin</h1>
+            <p class="tw-subtitle">
+                A simulation of the real supply chain behind every battery this Route Planner's EVs run on &mdash;
+                from brine extraction in Chile to a finished pack on the road in Rajasthan.
+            </p>
+            <div class="tw-badge"><span class="tw-badge-dot"></span>Built on: EV Route Optimizer + Charging Station Network</div>
+        </div>
+
+        <!-- What a digital twin is -->
+        <div class="tw-section">
+            <p>
+                A digital twin is not just another dashboard. A dashboard shows charts of what already
+                happened. A digital twin is a running model that mirrors a physical system closely enough
+                that you can ask it "what if this part of the chain breaks?" and trust the answer. That
+                takes three things together: a state that stays in sync with the real system (actual
+                inventory levels and shipment positions, not stale averages), behavior models that can
+                predict what happens next (mass balance, inventory dynamics, disruption risk), and a
+                feedback loop, so a decision made using the twin can actually change the real system &mdash;
+                a scenario run here becomes a real procurement or routing decision.
+            </p>
+
+            <div class="tw-card-grid">
+                <div class="tw-card">
+                    <div class="tw-card-eyebrow">01 / STATE</div>
+                    <h4>Synchronized State</h4>
+                    <p>Reflects the current condition of the physical system, not historical averages.</p>
+                </div>
+                <div class="tw-card">
+                    <div class="tw-card-eyebrow">02 / BEHAVIOR</div>
+                    <h4>Behavior Models</h4>
+                    <p>Mathematical models that predict what happens next, not just what already happened.</p>
+                </div>
+                <div class="tw-card">
+                    <div class="tw-card-eyebrow">03 / FEEDBACK</div>
+                    <h4>Feedback Loops</h4>
+                    <p>A decision made using the twin can change the physical system &mdash; the loop closes.</p>
+                </div>
+            </div>
+
+            <p>
+                This project builds toward that for one real chain: the lithium battery supply chain that
+                feeds the EVs this platform routes &mdash; explained next, followed by the concepts that make
+                the Analyze tab's scenarios behave like the real thing instead of a toy.
+            </p>
+        </div>
+
+        <!-- The real lithium supply chain -->
+        <div class="tw-section">
+            <div class="tw-pipeline">
+                <div class="tw-pipe-stage">
+                    <div class="tw-pipe-icon">🧂</div>
+                    <div class="stage-label">Brine Extraction</div>
+                    <div class="stage-sub">Atacama, Chile</div>
+                </div>
+                <div class="tw-pipe-arrow">&rarr;</div>
+                <div class="tw-pipe-stage">
+                    <div class="tw-pipe-icon">🚢</div>
+                    <div class="stage-label">Chemical Processing</div>
+                    <div class="stage-sub">China</div>
+                </div>
+                <div class="tw-pipe-arrow">&rarr;</div>
+                <div class="tw-pipe-stage">
+                    <div class="tw-pipe-icon">⚗️</div>
+                    <div class="stage-label">Precursor &amp; Cell Mfg</div>
+                    <div class="stage-sub">China</div>
+                </div>
+                <div class="tw-pipe-arrow">&rarr;</div>
+                <div class="tw-pipe-stage">
+                    <div class="tw-pipe-icon">🔋</div>
+                    <div class="stage-label">Pack Assembly</div>
+                    <div class="stage-sub">India</div>
+                </div>
+                <div class="tw-pipe-arrow">&rarr;</div>
+                <div class="tw-pipe-stage">
+                    <div class="tw-pipe-icon">🚗</div>
+                    <div class="stage-label">OEM &amp; Regions</div>
+                    <div class="stage-sub">Rajasthan</div>
+                </div>
+                <div class="tw-pipe-arrow">&#8635;</div>
+                <div class="tw-pipe-stage">
+                    <div class="tw-pipe-icon">♻️</div>
+                    <div class="stage-label">Recycling</div>
+                    <div class="stage-sub">Recovery loop</div>
+                </div>
+            </div>
+
+            <p>
+                Lithium for an EV battery crosses three continents and several industrial stages before it
+                ever reaches a car in Rajasthan, and each stage is a real physical bottleneck, which is why a
+                disruption anywhere in this chain is worth taking seriously. It starts as brine pumped from
+                underground reservoirs beneath Chile's Atacama salt flats into shallow evaporation ponds, where
+                sun and wind concentrate it over many months &mdash; a slow step, highly dependent on weather
+                and water availability, so a drought here is a real, documented risk. The concentrated brine is
+                then shipped and refined into battery-grade lithium carbonate or hydroxide, almost entirely in
+                China, which processes roughly two-thirds of the world's lithium chemicals regardless of where
+                it was mined (IEA Critical Minerals Report, 2022) &mdash; the single biggest geographic
+                concentration risk in the whole chain. From there the refined lithium becomes cathode precursor
+                material and is assembled into battery cells, still largely in China at the scale of
+                CATL-class manufacturers, before the cells travel to India to be assembled into complete,
+                safety-tested battery packs &mdash; a mechanical, near-lossless step (around 99% yield; Dunn
+                et al. 2021, <em>Joule</em>). Finished packs then go to the OEM that builds the EVs this
+                platform routes, and are distributed out to warehouses and dealers across Rajasthan's regions
+                &mdash; Jaipur, Jodhpur, Udaipur, and the rest. Finally, end-of-life batteries feed back into
+                the chain through hydrometallurgical recycling, recovering roughly 72% of the lithium content
+                (Harper et al. 2019, <em>Nature</em>) &mdash; real, but not full recovery, which is why new
+                mining stays necessary even as recycling scales up.
+            </p>
+
+            <div class="tw-callout">
+                Every yield-loss number in this twin (90% at extraction/processing, 95% at precursor
+                manufacturing, 96% at cell manufacturing, 99% at assembly, 72% recycling recovery) is a sourced
+                figure, not a guess &mdash; see below for how they're actually used in the simulation.
+            </div>
+        </div>
+
+        <!-- Concepts used in Analyze -->
+        <div class="tw-section">
+            <p>
+                Everything the Analyze tab shows you comes from a handful of supply chain concepts working
+                together, and all of them exist for a reason. <strong>Mass balance and yield loss</strong> is
+                the simplest: every node in the chain only turns part of what it receives into usable output
+                (brine extraction and processing at about 90%, precursor manufacturing at about 95%, cell
+                manufacturing at about 96%, pack assembly at about 99%, recycling recovery at about 72% --
+                IEA 2022/2023, Bloomberg 2022, Dunn et al. 2021, Harper et al. 2019), so the model never lets
+                material appear or vanish for free; it's why a capacity cut at one stage doesn't translate
+                into an equal-sized cut downstream, and why the Analyze tab's numbers are trustworthy rather
+                than just illustrative. On top of that, every node reorders from its supplier using a
+                <strong>base-stock policy with safety stock</strong>, sized against its own demand, its own
+                lead time, and the service level it's targeting, and orders are smoothed rather than jumping
+                straight to the target level (the APIOBPCS rule, Dejonckheere, Disney, Lambrecht &amp; Towill
+                2003) -- this is what gives you a realistic, gradually-adjusting inventory picture instead of
+                a chain that overreacts to every blip, and it's what the live policy table below is actually
+                showing. That same local, imperfect-information behavior is also what produces the
+                <strong>bullwhip effect</strong> -- order variability amplifying as it moves upstream (Lee,
+                Padmanabhan &amp; Whang 1997) -- which matters because it's the reason a small, short-lived
+                shock near the customer end can still cause a large, long-lived swing further up the chain.
+                To actually create a shock to study, the model uses <strong>disruption modeling</strong>: a
+                generic spec that temporarily cuts one parameter of one node or shipment link for a fixed
+                duration and then restores it, compared against a matched baseline run with the same random
+                demand, so any difference you see is attributable to the disruption itself and not to noise.
+                Because any single run is just one roll of the dice, the Analyze tab also runs the same
+                scenario many times with different, realistic random demand -- <strong>Monte Carlo risk
+                analysis</strong> -- so instead of one number you get a believable range, including how bad
+                the worst-case trials get, which is the whole point of the risk-analysis card you see after
+                running a scenario. A separate <strong>centralized optimization benchmark</strong> (a linear
+                program solved with PuLP) then asks what the best possible outcome would be if one planner
+                had perfect visibility and foresight over the whole chain, under the same physical limits --
+                comparing that to the simulated result tells you how much of the shortfall is simply the cost
+                of nodes making decentralized decisions with incomplete information, rather than the
+                disruption itself. Finally, because demand isn't one single national number, <strong>regional
+                demand disaggregation</strong> splits it across Rajasthan's real regions, weighted by each
+                region's actual warehouse capacity, which is exactly why the map on the Analyze tab can tell
+                you which specific region would be hit hardest rather than only giving you one national
+                average.
+            </p>
+        </div>
+
+        <!-- Live model data -->
+        <div class="tw-section">
+            <p>
+                The topology below is the chain exactly as the model sees it, read live from the running
+                model rather than retyped from a spreadsheet, so it can't drift out of sync with it.
+            </p>
+            <div class="topo-strip" id="topology-diagram">
+                <p style="color: var(--text-muted); font-size: 0.8rem;">Loading live topology&hellip;</p>
+            </div>
+
+            <div class="calib-row">
+                <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-color); padding: 1rem;">
+                    <p class="stat-label">National Demand Mean</p>
+                    <p class="stat-value" id="demand-mean-stat" style="font-size:1.1rem;">&ndash;</p>
+                </div>
+                <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-color); padding: 1rem;">
+                    <p class="stat-label">Demand CV</p>
+                    <p class="stat-value" id="demand-cv-stat" style="font-size:1.1rem;">&ndash;</p>
+                </div>
+                <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-color); padding: 1rem;">
+                    <p class="stat-label">Target Service Level</p>
+                    <p class="stat-value" id="service-level-stat" style="font-size:1.1rem;">&ndash;</p>
+                </div>
+            </div>
+
+            <table id="policy-table">
+                <thead>
+                    <tr><th>Node</th><th>Demand Mean (own input)</th><th>Lead Time</th><th>Safety Stock</th><th>Base-Stock Level (S)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="5" style="color: var(--text-muted); font-size: 0.8rem;">Loading live policy data&hellip;</td></tr>
+                </tbody>
+            </table>
+
+            <a class="dashboard-link" href="supply-chain.html">Try a scenario and see all of this live on Analyze &rarr;</a>
+        </div>
+
+        <div id="back-link-root"></div>
+    </div>
+    </div>
+
+    <script defer src="./how-it-works.js"></script>
+</body>
+</html>

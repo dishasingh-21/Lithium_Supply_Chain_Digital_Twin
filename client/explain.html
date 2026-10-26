@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explain Results - Lithium Supply Chain Digital Twin</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .story-section {
+            margin-bottom: 1.75rem;
+        }
+        .story-section h3 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 0.6rem;
+        }
+        .story-section p {
+            color: var(--text-main);
+            line-height: 1.7;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+        .headline-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 2rem 1.75rem;
+            margin-bottom: 2rem;
+        }
+        .headline-card .eyebrow {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+        .headline-card h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+        .story-flow {
+            position: relative;
+            padding-left: 1.5rem;
+            border-left: 2px dashed var(--border-color);
+        }
+        .story-step {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+        .story-step:last-child { padding-bottom: 0; }
+        .story-step::before {
+            content: "";
+            position: absolute;
+            left: -1.95rem;
+            top: 0.2rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+        .story-step .stage-name {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        .story-step p {
+            font-size: 0.85rem;
+            margin-bottom: 0;
+        }
+        .takeaway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0 1.5rem;
+        }
+        .takeaway-tile {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+        }
+        .takeaway-tile .stat-label { margin-bottom: 0.3rem; }
+        .region-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .region-pill {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
+            color: #fff;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <div id="top-nav-root"></div>
+    <script src="nav.js"></script>
+    <div class="app-container">
+        <main class="main-content" style="max-width: 760px; margin: 0 auto;">
+            <header class="top-header">
+                <div class="brand" style="margin-bottom: 0;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin: 0;">Explain These Results</h2>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">What this scenario means, told as a story -- no prior knowledge needed.</span>
+                </div>
+            </header>
+
+            <div id="explain-content">
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Loading&hellip;</p>
+            </div>
+            <div id="back-link-root"></div>
+        </main>
+    </div>
+
+    <script defer src="./explain.js"></script>
+</body>
+</html>

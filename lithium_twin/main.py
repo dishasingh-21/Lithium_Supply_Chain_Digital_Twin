@@ -16,6 +16,8 @@ WHAT TO LOOK FOR IN THE OUTPUT:
 """
 
 from __future__ import annotations
+import datetime
+import json
 import sys
 from pathlib import Path
 from lithium_twin.simulation.capacity import set_generous_capacities
@@ -31,10 +33,67 @@ from lithium_twin.simulation.order_policy import build_policies
 from lithium_twin.simulation.engine import SupplyChainEngine
 
 CHAIN_JSON = Path(__file__).parent / "data" / "chain.json"
+CLIENT_MODEL_JSON = Path(__file__).parent.parent / "client" / "data" / "model_overview.json"
 WEEKS = 156
 DEMAND_MEAN = lce_from_kwh(200_000 * 30, "LFP") / 52.0   # ~36,862 kg/wk
 DEMAND_CV = 0.15
 SERVICE_LEVEL = 0.95
+
+
+def export_model_overview_json(graph: SupplyChainGraph, policies: dict, path: str | Path = CLIENT_MODEL_JSON) -> None:
+    """Writes a static JSON snapshot of the chain topology and calibrated
+    order policies for the client's "How It Works" explainer page -- real
+    numbers read straight off the live model (post set_generous_capacities,
+    the capacities the engine actually runs with), not hand-typed copies
+    that could silently drift out of sync with chain.json or a future
+    recalibration. Must be called BEFORE engine.run() mutates node state --
+    inventory_on_hand needs to still be each node's INITIAL inventory."""
+    nodes = []
+    for node_id in graph.topological_sort():
+        n = graph.get_node(node_id)
+        nodes.append({
+            "node_id": n.node_id,
+            "node_type": n.node_type.value,
+            "location": n.location,
+            "weekly_capacity_lce": n.weekly_capacity,
+            "lead_time_weeks": n.lead_time_weeks,
+            "yield_rate": n.yield_rate,
+            "initial_inventory_lce": n.inventory_on_hand,
+            "downstream": graph.downstream_nodes(node_id),
+        })
+    arcs = []
+    for node_id in graph.topological_sort():
+        for dest_id in graph.downstream_nodes(node_id):
+            arc = graph.arc_data(node_id, dest_id)
+            arcs.append({
+                "source": node_id,
+                "dest": dest_id,
+                "capacity_lce": arc["capacity_lce"],
+                "lead_time_weeks": arc["lead_time_weeks"],
+                "transport_loss": arc.get("transport_loss", 0.0),
+            })
+    policy_rows = {
+        node_id: {
+            "base_stock_level": p.base_stock_level,
+            "safety_stock": p.safety_stock,
+            "demand_mean": p.demand_mean,
+            "lead_time": p.lead_time,
+            "smoothing_alpha": p.smoothing_alpha,
+        }
+        for node_id, p in policies.items()
+    }
+    payload = {
+        "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "demand_mean_kg_lce_per_week": DEMAND_MEAN,
+        "demand_cv": DEMAND_CV,
+        "service_level": SERVICE_LEVEL,
+        "nodes": nodes,
+        "arcs": arcs,
+        "policies": policy_rows,
+    }
+    out_path = Path(path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
 def run() -> None:
@@ -57,6 +116,11 @@ def run() -> None:
     print(f"\nOrder policies (service level {SERVICE_LEVEL:.0%}):")
     for node_id, policy in policies.items():
         print(f"  {node_id:30s}  {policy.summary()}")
+
+    # ── Export topology + policies snapshot for the client's "How It
+    # Works" page (before engine.run() mutates node inventory) ─────────
+    export_model_overview_json(graph, policies)
+    print(f"\nModel overview snapshot written to {CLIENT_MODEL_JSON}")
 
     # ── Run simulation ────────────────────────────────────────────────
     engine = SupplyChainEngine(graph, log, policies, demand_gen, service_level=SERVICE_LEVEL)

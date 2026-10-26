@@ -1,126 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EV Route Planner</title>
+    <title>Lithium Supply Chain Digital Twin</title>
     <link rel="stylesheet" href="index.css">
     <script src="config.js"></script>
 </head>
-
-<body class="no-sidebar">
+<body>
+    <!-- Home page gets a plain title bar, not the tabbed Analyze/Theory/
+         Logistics nav -- the three buttons below already ARE that
+         navigation, so repeating it as pills up top would be redundant. -->
+    <header class="home-titlebar">Lithium Supply Chain Digital Twin</header>
     <div class="app-container">
-        <!-- Sidebar Hidden for Landing -->
-        <aside class="sidebar"></aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="top-header"
-                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 3rem;">
-                <div class="brand" style="margin-bottom: 0;">
-                    <h1
-                        style="font-size: 2.25rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.75rem; color: var(--primary);">
-                        EV Route Planner</h1>
-                    <span style="color: var(--text-muted); font-weight: 500; font-size: 1rem;">Plan your journeys with
-                        precision.</span>
-                </div>
-                <div style="display: flex; gap: 1.25rem; align-items: center;">
-                    <div style="text-align: right;">
-                        <h4 style="font-size: 0.9rem; font-weight: 600;">User XYZ</h4>
-                        <p style="font-size: 0.75rem; color: var(--text-muted);">Admin Access</p>
-                    </div>
-                    <div class="user-avatar"
-                        style="width: 40px; height: 40px; font-size: 0.9rem; background: var(--primary); color: white;">
-                        UX</div>
-                </div>
-            </header>
-
-            <div class="card" style="margin-top: 3rem;">
-                <div class="card-title">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                            style="color: var(--primary);">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="22" y1="12" x2="18" y2="12"></line>
-                            <line x1="6" y1="12" x2="2" y2="12"></line>
-                            <line x1="12" y1="6" x2="12" y2="2"></line>
-                            <line x1="12" y1="22" x2="12" y2="18"></line>
-                        </svg>
-                        Enter Route Parameters
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Starting Point</label>
-                        <input id="start" type="text" placeholder="Enter origin address..." list="warehouseList">
-                        <datalist id="warehouseList"></datalist>
-                    </div>
-                    <div class="form-group">
-                        <label>Ending Destination</label>
-                        <input id="end" type="text" placeholder="Enter final stop...">
-                    </div>
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label>Current Battery %</label>
-                        <input id="battery" type="number" placeholder="e.g. 80" min="1" max="100">
-                    </div>
-                </div>
-
-                <div style="margin-top: 2rem; display: flex; justify-content: center;">
-                    <button class="btn-primary" style="width: 100%; max-width: 300px;" onclick="goToMap()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m5 12 7-7 7 7"></path>
-                            <path d="M12 19V5"></path>
-                        </svg>
-                        Calculate Route
-                    </button>
-                </div>
+        <main class="home-hero">
+            <h1>Lithium Supply Chain Digital Twin</h1>
+            <p>
+                A live simulation of Rajasthan's lithium-battery supply chain, built on top of the EV route
+                optimizer. Pick where to start.
+            </p>
+            <div class="home-buttons">
+                <a href="how-it-works.html" class="home-btn">
+                    Theory
+                    <span class="home-btn-sub">Understand the supply chain concepts behind the model</span>
+                </a>
+                <a href="supply-chain.html" class="home-btn">
+                    Analyse
+                    <span class="home-btn-sub">Run a disruption scenario and see the impact</span>
+                </a>
+                <a href="route.html" class="home-btn">
+                    Logistics
+                    <span class="home-btn-sub">Plan an EV route between warehouses</span>
+                </a>
             </div>
         </main>
     </div>
-
-    <script>
-        // Populate the warehouse autocomplete list for the Starting Point field.
-        // Purely additive: typing a warehouse name here (e.g. "Jaipur Fulfillment
-        // Center") routes as a pickup->delivery trip; typing anything else keeps
-        // the original place-to-place geocoded planner behavior.
-        (async function loadWarehouseOptions() {
-            try {
-                const res = await fetch(`${window.API_BASE_URL}/warehouses`);
-                const data = await res.json();
-                const list = document.getElementById("warehouseList");
-                (data.warehouses || []).forEach((w) => {
-                    const opt = document.createElement("option");
-                    opt.value = w.name;
-                    list.appendChild(opt);
-                });
-            } catch (err) {
-                console.warn("Could not load warehouse list:", err);
-            }
-        })();
-
-        function goToMap() {
-            let start = document.getElementById("start").value;
-            let end = document.getElementById("end").value;
-            let battery = document.getElementById("battery").value;
-            if (!start || !end || !battery) {
-                alert("Please fill all the fields!");
-                return;
-            }
-            if (start === end) {
-                alert("Start and destination cannot be same!");
-                return;
-            }
-            if (battery <= 0 || battery > 100) {
-                alert("Battery %ge must be between 1 to 100.");
-                return;
-            }
-            window.location.href = `map.html?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&battery=${encodeURIComponent(battery)}`;
-        }
-    </script>
 </body>
-
 </html>

@@ -305,7 +305,17 @@ class SupplyChainEngine:
 
     # METRICS SNAPSHOT PROCESS
     def _snapshot_process(self, total_weeks: int):
-        """Records system-wide state at end of each week for analysis."""
+        """Records system-wide state at end of each week for analysis.
+
+        "nodes" generalizes the original three hardcoded per-node fields
+        (oem_inventory, pack_inventory, china_proc_inventory, etc.) to
+        EVERY node in the chain, keyed by node_id -- added so a per-stage
+        week-by-week trajectory (a sparkline showing exactly when a
+        disruption's shock hits a given stage and how long it takes to
+        recover) can be drawn for any node, not just the three that
+        happened to be named explicitly early on. The original fields are
+        kept unchanged alongside it so nothing that already reads them
+        (main.py's diagnostic loop, existing tests) breaks."""
         for _ in range(total_weeks):
             yield self.env.timeout(1)
             week = int(self.env.now)
@@ -322,6 +332,13 @@ class SupplyChainEngine:
                 "pack_inventory": pack.inventory_on_hand,
                 "pack_backlog": pack.total_backlog(),
                 "china_proc_inventory": china.inventory_on_hand,
+                "nodes": {
+                    n.node_id: {
+                        "inventory": n.inventory_on_hand,
+                        "backlog": n.total_backlog(),
+                    }
+                    for n in self.graph.all_nodes()
+                },
             })
 
     # ANALYSIS HELPERS

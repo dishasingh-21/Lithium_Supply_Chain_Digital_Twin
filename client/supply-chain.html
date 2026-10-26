@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze - Lithium Supply Chain Digital Twin</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
+    <style>
+        .region-label {
+            background: white;
+            border: 1px solid var(--primary);
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .legend-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .narrative-box {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            height: 100%;
+        }
+        .topo-strip {
+            display: flex;
+            align-items: center;
+            overflow-x: auto;
+            padding: 1rem 0.5rem;
+        }
+        .topo-card {
+            flex: 0 0 150px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.875rem;
+            box-shadow: var(--shadow);
+        }
+        .topo-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            min-height: 2.2em;
+        }
+        .topo-stats {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .topo-stats .fill-good { color: var(--success); font-weight: 700; }
+        .topo-stats .fill-ok { color: var(--accent); font-weight: 700; }
+        .topo-stats .fill-bad { color: var(--danger); font-weight: 700; }
+        .topo-arrow {
+            flex: 0 0 40px;
+            text-align: center;
+            font-size: 1.25rem;
+            color: var(--primary-light);
+        }
+        .warehouse-popup b { color: var(--primary); }
+        /* This page stacks several cards ABOVE the map, unlike map.html which
+           is a single full-screen map view -- index.css's .map-container
+           (calc(100vh - 180px)) and .bottom-info-bar (position: fixed)
+           were sized for that single-view page and make THIS page
+           overflow well past 100% zoom. Scoped overrides here, not in
+           index.css, so map.html's own layout is untouched. */
+        .map-container {
+            height: 60vh;
+            min-height: 420px;
+        }
+        .bottom-info-bar {
+            position: static;
+            left: auto;
+            right: auto;
+            bottom: auto;
+            margin-top: 1rem;
+            backdrop-filter: none;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .region-popup-note {
+            margin-top: 0.4rem;
+            padding-top: 0.4rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            max-width: 220px;
+        }
+        .sparkline-wrap {
+            margin-top: 0.5rem;
+            padding-top: 0.4rem;
+            border-top: 1px dashed var(--border-color);
+        }
+        .sparkline-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.2rem;
+        }
+        .distribution-wrap {
+            margin-top: 1rem;
+        }
+        .distribution-chart-box {
+            background: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 0.75rem 0.25rem;
+        }
+        .distribution-chart-box svg {
+            max-height: 110px;
+        }
+        .distribution-axis-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.2rem;
+        }
+        .distribution-legend {
+            display: flex;
+            gap: 1.25rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .distribution-legend .legend-line {
+            display: inline-block;
+            width: 16px;
+            height: 2px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        /* ---- New: page intro, two-screen form/results flow, 2-col MC layout ---- */
+        .page-intro {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.15rem;
+        }
+        .section-intro {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+        .scenario-summary-bar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            padding: 0.9rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .scenario-summary-text {
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+        .scenario-summary-text b { color: var(--primary); }
+        .btn-secondary-sm {
+            flex: 0 0 auto;
+            padding: 0.5rem 1.1rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .btn-secondary-sm:hover { background: var(--primary); color: #fff; }
+        #results-section { display: none; }
+        .mc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .mc-grid { grid-template-columns: 1fr; }
+        }
+        .field-hint {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+    </style>
+    <script src="config.js"></script>
+</head>
+<body>
+    <div id="top-nav-root"></div>
+    <script src="nav.js"></script>
+    <div class="app-container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="brand" style="margin-bottom: 0;">
+                    <h2 style="font-size: 1.1rem; font-weight: 700; color: var(--primary); margin: 0;">Analyze a Disruption</h2>
+                    <span class="page-intro">
+                        See what happens to Rajasthan's lithium supply chain if a shipment, mine, or factory
+                        slows down. Want to understand the model first? See <a href="how-it-works.html" style="color: var(--primary);">Theory</a>.
+                    </span>
+                </div>
+            </header>
+
+            <!-- Screen 1: the scenario form. Visible by default; collapses into the
+                 summary bar below once a result (fresh or previously saved) is shown. -->
+            <div class="card" id="scenario-form-card">
+                <div class="card-title">Set Up a Scenario</div>
+                <p class="section-intro">
+                    Pick one part of the supply chain, say how it's affected, and run the simulation.
+                    This replays the whole chain twice &mdash; once normally, once with your disruption &mdash;
+                    so you can see exactly what changes.
+                </p>
+                <div class="form-grid" style="grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                    <div class="form-group">
+                        <label>What's affected?</label>
+                        <select id="sf-target-type">
+                            <option value="arc" selected>A shipment / transport link</option>
+                            <option value="node">A single facility or stage</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Which one?</label>
+                        <select id="sf-target-id"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>What changes about it?</label>
+                        <select id="sf-parameter"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cut it by how much (%)</label>
+                        <input id="sf-reduction-pct" type="number" min="1" max="100" value="40">
+                    </div>
+                    <div class="form-group">
+                        <label>Starting in week</label>
+                        <input id="sf-start-week" type="number" min="1" value="70">
+                    </div>
+                    <div class="form-group">
+                        <label>Lasting how many weeks</label>
+                        <input id="sf-duration-weeks" type="number" min="1" value="15">
+                    </div>
+                    <div class="form-group">
+                        <label>Total weeks to simulate</label>
+                        <input id="sf-weeks" type="number" min="20" max="208" value="104">
+                        <div class="field-hint">Longer runs show more of the recovery after the disruption ends.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Simulated futures to try</label>
+                        <input id="sf-n-trials" type="number" min="10" max="300" value="100">
+                        <div class="field-hint">More trials give a steadier picture of the risk, but take longer to run.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin key (required to run)</label>
+                        <input id="sf-api-key" type="password" placeholder="x-api-key">
+                    </div>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                    <button class="btn-primary" id="sf-submit" style="width: auto; padding: 0.75rem 2rem;">Run This Scenario</button>
+                    <button class="btn-secondary-sm" id="sf-cancel-edit" style="display: none;">Cancel</button>
+                    <span id="sf-status" style="font-size: 0.8rem; color: var(--text-muted);"></span>
+                </div>
+            </div>
+
+            <!-- Collapsed summary bar: replaces the form once a result is on screen,
+                 so the results have room to breathe instead of fighting a full form for attention. -->
+            <div class="scenario-summary-bar" id="scenario-summary-bar">
+                <div class="scenario-summary-text" id="scenario-summary-text">&ndash;</div>
+                <button class="btn-secondary-sm" id="scenario-summary-edit">Edit scenario</button>
+            </div>
+
+            <!-- Screen 2: results. Hidden until there's something to show. -->
+            <div id="results-section">
+                <div class="card" id="monte-carlo-card">
+                    <div class="card-title">Monte Carlo Risk Analysis</div>
+                    <p class="section-intro">
+                        One run could just be luck. So instead the model replays this same scenario many times
+                        with realistic randomness, and compares the spread of outcomes to a normal (no-disruption) run.
+                    </p>
+                    <div class="mc-grid">
+                        <div class="narrative-box" id="mc-narrative">Loading plain-English summary&hellip;</div>
+                        <div>
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <p class="stat-label">Normal Fill Rate</p>
+                                    <p class="stat-value" id="mc-baseline-fill">&ndash;</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted);" id="mc-baseline-range">&ndash;</p>
+                                </div>
+                                <div class="stat-card">
+                                    <p class="stat-label">Fill Rate With Disruption</p>
+                                    <p class="stat-value" id="mc-disrupted-fill">&ndash;</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted);" id="mc-disrupted-range">&ndash;</p>
+                                </div>
+                                <div class="stat-card">
+                                    <p class="stat-label">Average Impact</p>
+                                    <p class="stat-value" id="mc-impact" style="color: var(--danger);">&ndash;</p>
+                                    <p style="font-size: 0.7rem; color: var(--text-muted);" id="mc-impact-range">&ndash;</p>
+                                </div>
+                                <div class="stat-card">
+                                    <p class="stat-label">Extra Backlog (avg)</p>
+                                    <p class="stat-value" id="mc-backlog-delta">&ndash;</p>
+                                </div>
+                            </div>
+                            <div class="distribution-wrap" id="mc-distribution-wrap" style="display: none;">
+                                <div class="sparkline-label">Every simulated trial, sorted worst to best</div>
+                                <div class="distribution-chart-box">
+                                    <div id="mc-distribution-chart"></div>
+                                    <div class="distribution-axis-label">
+                                        <span>&larr; Worst trials</span>
+                                        <span>Best trials &rarr;</span>
+                                    </div>
+                                </div>
+                                <div class="distribution-legend" id="mc-distribution-legend"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="chain-flow-card">
+                    <div class="card-title">How Each Stage Responds</div>
+                    <p class="section-intro" id="flow-disruption-desc">Loading&hellip;</p>
+                    <div class="topo-strip" id="flow-diagram">
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">Loading chain flow data&hellip;</p>
+                    </div>
+                </div>
+
+                <div class="card-title" style="margin: 0 0 0.25rem 0.25rem;">Where the Impact Shows Up</div>
+                <p class="section-intro" style="margin: 0 0 1rem 0.25rem;">
+                    Each circle below is a region in Rajasthan, sized by how much lithium-battery demand it accounts
+                    for and colored by how well supply is keeping up there. Pin markers are the route planner's
+                    actual warehouses, so you can see which ones sit inside a region under strain. Click a circle
+                    for details.
+                </p>
+                <div class="map-container">
+                    <div id="map"></div>
+
+                    <!-- Bottom Info Bar -->
+                    <div class="bottom-info-bar">
+                        <div style="display: flex; gap: 2rem;">
+                            <div>
+                                <p class="stat-label">Overall Fill Rate</p>
+                                <p class="stat-value" style="font-size: 1.1rem;"><span id="overall-fill-rate">--</span></p>
+                            </div>
+                            <div>
+                                <p class="stat-label">Regions Tracked</p>
+                                <p class="stat-value" style="font-size: 1.1rem;"><span id="region-count">--</span></p>
+                            </div>
+                            <div>
+                                <p class="stat-label">Simulated Weeks</p>
+                                <p class="stat-value" style="font-size: 1.1rem;"><span id="weeks-simulated">--</span></p>
+                            </div>
+                            <div id="windowed-fill-wrap" style="display: none;">
+                                <p class="stat-label">Fill Rate During Disruption</p>
+                                <p class="stat-value" style="font-size: 1.1rem; color: var(--danger);"><span id="windowed-fill-rate">--</span></p>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 1.5rem;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                <span class="legend-dot" style="background: var(--success);"></span>On target (&ge;95%)
+                                <span class="legend-dot" style="background: var(--accent); margin-left: 0.75rem;"></span>Below target (80-95%)
+                                <span class="legend-dot" style="background: var(--danger); margin-left: 0.75rem;"></span>Severe shortfall (&lt;80%)
+                            </div>
+                            <div style="text-align: right;">
+                                <p class="stat-label">Status</p>
+                                <p style="font-weight: 600; font-size: 0.8rem; color: var(--primary);" id="status-text">Initializing...</p>
+                            </div>
+                            <div id="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+                    <button class="btn-secondary-sm" id="explain-results-btn">Explain These Results &rarr;</button>
+                </div>
+            </div>
+            <div id="back-link-root"></div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <script defer src="./supply-chain.js"></script>
+</body>
+</html>

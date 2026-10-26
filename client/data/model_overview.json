@@ -1,0 +1,197 @@
+{
+  "generated_at": "2026-10-26T06:57:06.416360+00:00",
+  "demand_mean_kg_lce_per_week": 36850.09918765862,
+  "demand_cv": 0.15,
+  "service_level": 0.95,
+  "nodes": [
+    {
+      "node_id": "atacama-deposits",
+      "node_type": "extractor",
+      "location": "Atacama, Chile",
+      "weekly_capacity_lce": 120000,
+      "lead_time_weeks": 10,
+      "yield_rate": 0.9,
+      "initial_inventory_lce": 50000000,
+      "downstream": [
+        "chile-mining"
+      ]
+    },
+    {
+      "node_id": "chile-mining",
+      "node_type": "extractor",
+      "location": "Salar de Atacama, Chile",
+      "weekly_capacity_lce": 110000,
+      "lead_time_weeks": 10,
+      "yield_rate": 0.9,
+      "initial_inventory_lce": 880000,
+      "downstream": [
+        "china-processing"
+      ]
+    },
+    {
+      "node_id": "china-processing",
+      "node_type": "processor",
+      "location": "Sichuan / Qinghai, China",
+      "weekly_capacity_lce": 55000,
+      "lead_time_weeks": 7,
+      "yield_rate": 0.9,
+      "initial_inventory_lce": 385000,
+      "downstream": [
+        "china-precursor"
+      ]
+    },
+    {
+      "node_id": "china-precursor",
+      "node_type": "manufacturer",
+      "location": "Guangdong / Hunan, China",
+      "weekly_capacity_lce": 46000,
+      "lead_time_weeks": 4,
+      "yield_rate": 0.95,
+      "initial_inventory_lce": 184000,
+      "downstream": [
+        "china-cell-mfg"
+      ]
+    },
+    {
+      "node_id": "china-cell-mfg",
+      "node_type": "assembler",
+      "location": "Fujian / Guangdong, China",
+      "weekly_capacity_lce": 43000,
+      "lead_time_weeks": 4,
+      "yield_rate": 0.96,
+      "initial_inventory_lce": 172000,
+      "downstream": [
+        "india-pack-assembly"
+      ]
+    },
+    {
+      "node_id": "india-pack-assembly",
+      "node_type": "assembler",
+      "location": "Pune / Sanand, Gujarat, India",
+      "weekly_capacity_lce": 41000,
+      "lead_time_weeks": 3,
+      "yield_rate": 0.99,
+      "initial_inventory_lce": 123000,
+      "downstream": [
+        "india-oem"
+      ]
+    },
+    {
+      "node_id": "india-oem",
+      "node_type": "oem",
+      "location": "Pune / Bengaluru / Rajasthan, India",
+      "weekly_capacity_lce": 40000,
+      "lead_time_weeks": 2,
+      "yield_rate": 1.0,
+      "initial_inventory_lce": 148000,
+      "downstream": [
+        "india-recycling"
+      ]
+    },
+    {
+      "node_id": "india-recycling",
+      "node_type": "recycler",
+      "location": "Mumbai / Pune, India",
+      "weekly_capacity_lce": 5000,
+      "lead_time_weeks": 8,
+      "yield_rate": 0.72,
+      "initial_inventory_lce": 20000,
+      "downstream": []
+    }
+  ],
+  "arcs": [
+    {
+      "source": "atacama-deposits",
+      "dest": "chile-mining",
+      "capacity_lce": 83979.3,
+      "lead_time_weeks": 1,
+      "transport_loss": 0.01
+    },
+    {
+      "source": "chile-mining",
+      "dest": "china-processing",
+      "capacity_lce": 75581.4,
+      "lead_time_weeks": 10,
+      "transport_loss": 0.005
+    },
+    {
+      "source": "china-processing",
+      "dest": "china-precursor",
+      "capacity_lce": 68023.3,
+      "lead_time_weeks": 2,
+      "transport_loss": 0.002
+    },
+    {
+      "source": "china-precursor",
+      "dest": "china-cell-mfg",
+      "capacity_lce": 64622.1,
+      "lead_time_weeks": 1,
+      "transport_loss": 0.001
+    },
+    {
+      "source": "china-cell-mfg",
+      "dest": "india-pack-assembly",
+      "capacity_lce": 62037.2,
+      "lead_time_weeks": 4,
+      "transport_loss": 0.003
+    },
+    {
+      "source": "india-pack-assembly",
+      "dest": "india-oem",
+      "capacity_lce": 61416.8,
+      "lead_time_weeks": 2,
+      "transport_loss": 0.001
+    },
+    {
+      "source": "india-oem",
+      "dest": "india-recycling",
+      "capacity_lce": 2000,
+      "lead_time_weeks": 260,
+      "transport_loss": 0.05
+    }
+  ],
+  "policies": {
+    "chile-mining": {
+      "base_stock_level": 62819.62,
+      "safety_stock": 12432.03,
+      "demand_mean": 50387.59260853419,
+      "lead_time": 1,
+      "smoothing_alpha": 0.35
+    },
+    "china-processing": {
+      "base_stock_level": 488870.52,
+      "safety_stock": 35382.18,
+      "demand_mean": 45348.833347680775,
+      "lead_time": 10,
+      "smoothing_alpha": 0.35
+    },
+    "china-precursor": {
+      "base_stock_level": 95868.95,
+      "safety_stock": 14241.05,
+      "demand_mean": 40813.9500129127,
+      "lead_time": 2,
+      "smoothing_alpha": 0.35
+    },
+    "china-cell-mfg": {
+      "base_stock_level": 48339.7,
+      "safety_stock": 9566.45,
+      "demand_mean": 38773.25251226706,
+      "lead_time": 1,
+      "smoothing_alpha": 0.35
+    },
+    "india-pack-assembly": {
+      "base_stock_level": 167256.87,
+      "safety_stock": 18367.58,
+      "demand_mean": 37222.32241177638,
+      "lead_time": 4,
+      "smoothing_alpha": 0.35
+    },
+    "india-oem": {
+      "base_stock_level": 86558.16,
+      "safety_stock": 12857.96,
+      "demand_mean": 36850.09918765862,
+      "lead_time": 2,
+      "smoothing_alpha": 0.35
+    }
+  }
+}

@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Route - EV Route Planner</title>
+    <title>Route - Lithium Supply Chain Digital Twin</title>
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""/>
     <style>
+        /* The sitewide top nav adds var(--header-height) of fixed space
+           that this page's original height math didn't account for. */
+        .map-container {
+            height: calc(100vh - 180px - var(--header-height));
+        }
         .station-label {
             background: white;
             border: 1px solid var(--primary);
@@ -22,48 +27,13 @@
     <script src="config.js"></script>
 </head>
 <body>
+    <div id="top-nav-root"></div>
+    <script src="nav.js"></script>
     <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="brand">
-                <h2 style="font-size: 1.25rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 0.25rem;">EV Route Planner</h2>
-                <span style="font-size: 0.7rem; font-weight: 500; color: var(--text-muted);">Plan your journeys with precision.</span>
-            </div>
-            
-            <nav class="nav-menu">
-                <div class="nav-item">
-                    <a href="#" class="nav-link active">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v12l5-3 5 3 5-3 5 3V6l-5-3-5 3-5-3-5 3z"></path></svg>
-                        <span>Route</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="javascript:void(0)" class="nav-link" onclick="devAlert()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <span>Live Route Updates</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="javascript:void(0)" class="nav-link" onclick="devAlert()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                        <span>History</span>
-                    </a>
-                </div>
-            </nav>
-
-            <div class="user-profile">
-                <div class="user-avatar">UX</div>
-                <div class="user-info">
-                    <h4>User XYZ</h4>
-                    <p>Admin Access</p>
-                </div>
-            </div>
-        </aside>
-
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-header" style="justify-content: flex-end;">
-                <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="window.location.href='index.html'">
+                <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem;" onclick="window.location.href='route.html'">
                     New Route
                 </button>
             </header>
@@ -93,6 +63,7 @@
                     </div>
                 </div>
             </div>
+            <div id="back-link-root"></div>
         </main>
     </div>
 
@@ -100,10 +71,5 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
     <script defer src="./script2.js"></script>
-    <script>
-        function devAlert() {
-            alert("This tab is currently under development.");
-        }
-    </script>
 </body>
 </html>

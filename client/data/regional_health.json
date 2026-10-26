@@ -1,0 +1,88 @@
+{
+  "generated_at": "2026-10-26T11:09:14.809900+00:00",
+  "weeks_simulated": 104,
+  "seed": 42,
+  "service_level_target": 0.95,
+  "overall_fill_rate": 0.4969372668449895,
+  "overall_fill_rate_during_disruption": 0.26398105855763976,
+  "disruption": {
+    "label": "india-pack-assembly->india-oem",
+    "target_type": "arc",
+    "parameter": "capacity_lce",
+    "reduction_pct": 0.9,
+    "start_week": 30,
+    "duration_weeks": 60
+  },
+  "regions": [
+    {
+      "region_id": "jaipur",
+      "name": "Jaipur Fulfillment Center",
+      "town": "Jaipur",
+      "lat": 26.9124,
+      "lon": 75.7873,
+      "demand_share": 0.21551724137931033,
+      "fill_rate": 0.49790550037310866,
+      "status": "red"
+    },
+    {
+      "region_id": "jodhpur",
+      "name": "Jodhpur Distribution Hub",
+      "town": "Jodhpur",
+      "lat": 26.209065,
+      "lon": 73.027268,
+      "demand_share": 0.1810344827586207,
+      "fill_rate": 0.4925150294461809,
+      "status": "red"
+    },
+    {
+      "region_id": "udaipur",
+      "name": "Udaipur Regional Warehouse",
+      "town": "Udaipur",
+      "lat": 24.575043,
+      "lon": 73.690237,
+      "demand_share": 0.1336206896551724,
+      "fill_rate": 0.5034627964998759,
+      "status": "red"
+    },
+    {
+      "region_id": "ajmer",
+      "name": "Ajmer Depot",
+      "town": "Ajmer",
+      "lat": 26.407877,
+      "lon": 74.621291,
+      "demand_share": 0.1206896551724138,
+      "fill_rate": 0.49409540299909954,
+      "status": "red"
+    },
+    {
+      "region_id": "bikaner",
+      "name": "Bikaner North Warehouse",
+      "town": "Bikaner",
+      "lat": 28.009432,
+      "lon": 73.284382,
+      "demand_share": 0.10775862068965517,
+      "fill_rate": 0.491981242522987,
+      "status": "red"
+    },
+    {
+      "region_id": "kota",
+      "name": "Kota Industrial Warehouse",
+      "town": "Kota",
+      "lat": 25.241594,
+      "lon": 76.882369,
+      "demand_share": 0.15517241379310345,
+      "fill_rate": 0.49993614863902236,
+      "status": "red"
+    },
+    {
+      "region_id": "alwar",
+      "name": "Alwar Transit Hub",
+      "town": "Alwar",
+      "lat": 27.55,
+      "lon": 76.63,
+      "demand_share": 0.08620689655172414,
+      "fill_rate": 0.4978912255592756,
+      "status": "red"
+    }
+  ]
+}
