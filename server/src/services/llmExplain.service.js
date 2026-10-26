@@ -4,14 +4,12 @@ const fetch = require("node-fetch");
 // the same "/v1/chat/completions" shape -- which includes NVIDIA's hosted
 // NIM models at build.nvidia.com (the Nemotron family among them). To
 // point this at NVIDIA instead of OpenAI, set in .env:
-//   OPENAI_BASE_URL=https://integrate.api.nvidia.com/v1
-//   OPENAI_API_KEY=nvapi-...                        (from build.nvidia.com/settings/api-keys)
-//   OPENAI_MODEL=nvidia/nemotron-3-super-120b-a12b   (or another Nemotron model id from build.nvidia.com/models)
-// The env var names stay "OPENAI_*" for simplicity -- they mean "the LLM
-// endpoint this feature calls", not literally OpenAI.
-const BASE_URL = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
+//   LLM_API_BASE_URL=https://integrate.api.nvidia.com/v1
+//   LLM_API_KEY=nvapi-...                            (from build.nvidia.com/settings/api-keys)
+//   LLM_MODEL=nvidia/nemotron-3.5-lightning-30b-a3b   (or another Nemotron model id from build.nvidia.com/models)
+const BASE_URL = (process.env.LLM_API_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
 const CHAT_COMPLETIONS_URL = `${BASE_URL}/chat/completions`;
-const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const MODEL = process.env.LLM_MODEL || "gpt-4o-mini";
 // Strict JSON response mode (`response_format: {type: "json_object"}`) is
 // an OpenAI-specific guarantee -- not every OpenAI-compatible provider
 // honors that field, and some reject unrecognized request fields outright.
@@ -224,9 +222,9 @@ function extractJsonObject(content) {
 }
 
 async function callOpenAI(digest) {
-  const apiKey = process.env.OPENAI_API_KEY;
+   const apiKey = process.env.LLM_API_KEY;
   if (!apiKey) {
-    const err = new Error("OPENAI_API_KEY is not configured");
+    const err = new Error("LLM_API_KEY is not configured");
     err.code = "NO_API_KEY";
     throw err;
   }
@@ -266,7 +264,7 @@ async function callOpenAI(digest) {
   if (!res.ok) {
     const bodyText = await res.text().catch(() => "");
     const err = new Error(`LLM API returned ${res.status}: ${bodyText.slice(0, 500)}`);
-    err.code = "OPENAI_ERROR";
+    err.code = "LLM_ERROR";
     throw err;
   }
 

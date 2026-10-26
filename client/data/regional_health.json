@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-10-26T13:02:52.944453+00:00",
+  "generated_at": "2026-10-26T13:51:45.142042+00:00",
   "weeks_simulated": 104,
   "seed": 42,
   "service_level_target": 0.95,
-  "overall_fill_rate": 0.6809728983627314,
-  "overall_fill_rate_during_disruption": 0.5588619691428992,
+  "overall_fill_rate": 0.8905610095334332,
+  "overall_fill_rate_during_disruption": 0.9658008972377802,
   "disruption": {
-    "label": "china-cell-mfg->india-pack-assembly",
+    "label": "atacama-deposits->chile-mining",
     "target_type": "arc",
-    "parameter": "capacity_lce",
+    "parameter": "transport_loss",
     "reduction_pct": 0.78,
-    "start_week": 42,
-    "duration_weeks": 52
+    "start_week": 1,
+    "duration_weeks": 20
   },
   "regions": [
     {
@@ -21,8 +21,8 @@
       "lat": 26.9124,
       "lon": 75.7873,
       "demand_share": 0.21551724137931033,
-      "fill_rate": 0.6818462873217069,
-      "status": "red"
+      "fill_rate": 0.8910588575630121,
+      "status": "yellow"
     },
     {
       "region_id": "jodhpur",
@@ -31,8 +31,8 @@
       "lat": 26.209065,
       "lon": 73.027268,
       "demand_share": 0.1810344827586207,
-      "fill_rate": 0.677209672737005,
-      "status": "red"
+      "fill_rate": 0.8889484831596266,
+      "status": "yellow"
     },
     {
       "region_id": "udaipur",
@@ -41,8 +41,8 @@
       "lat": 24.575043,
       "lon": 73.690237,
       "demand_share": 0.1336206896551724,
-      "fill_rate": 0.6858897702502164,
-      "status": "red"
+      "fill_rate": 0.8910659520080585,
+      "status": "yellow"
     },
     {
       "region_id": "ajmer",
@@ -51,8 +51,8 @@
       "lat": 26.407877,
       "lon": 74.621291,
       "demand_share": 0.1206896551724138,
-      "fill_rate": 0.6804491970334221,
-      "status": "red"
+      "fill_rate": 0.8916070457553409,
+      "status": "yellow"
     },
     {
       "region_id": "bikaner",
@@ -61,8 +61,8 @@
       "lat": 28.009432,
       "lon": 73.284382,
       "demand_share": 0.10775862068965517,
-      "fill_rate": 0.6777249940422697,
-      "status": "red"
+      "fill_rate": 0.8894915305594269,
+      "status": "yellow"
     },
     {
       "region_id": "kota",
@@ -71,8 +71,8 @@
       "lat": 25.241594,
       "lon": 76.882369,
       "demand_share": 0.15517241379310345,
-      "fill_rate": 0.6822677607932631,
-      "status": "red"
+      "fill_rate": 0.89132053576399,
+      "status": "yellow"
     },
     {
       "region_id": "alwar",
@@ -81,8 +81,8 @@
       "lat": 27.55,
       "lon": 76.63,
       "demand_share": 0.08620689655172414,
-      "fill_rate": 0.6812078905521527,
-      "status": "red"
+      "fill_rate": 0.8903832248652218,
+      "status": "yellow"
     }
   ]
 }
