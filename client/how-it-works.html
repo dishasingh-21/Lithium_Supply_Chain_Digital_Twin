@@ -228,6 +228,119 @@
             font-weight: 600;
             color: var(--primary);
         }
+        /* --- Simplified-content additions --- */
+        .tw-section h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.2px;
+        }
+        .tw-section h2 .tw-num {
+            color: var(--primary);
+            margin-right: 0.4rem;
+        }
+        .tw-steps {
+            list-style: none;
+            counter-reset: step;
+            padding: 0;
+            margin: 1rem 0;
+        }
+        .tw-steps li {
+            counter-increment: step;
+            position: relative;
+            padding: 0.55rem 0 0.55rem 2.4rem;
+            border-bottom: 1px dashed var(--border-color);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+        .tw-steps li:last-child { border-bottom: none; }
+        .tw-steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0.55rem;
+            width: 1.6rem;
+            height: 1.6rem;
+            border-radius: 50%;
+            background: rgba(0, 91, 113, 0.08);
+            border: 1px solid rgba(0, 91, 113, 0.25);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .tw-steps li strong { color: var(--primary); }
+        .tw-concepts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+        .tw-concept {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.1rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .tw-concept h4 {
+            color: var(--text-main);
+            font-size: 0.92rem;
+            margin: 0;
+        }
+        .tw-concept .tw-tag {
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+        .tw-concept p {
+            color: var(--text-main);
+            font-size: 0.82rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .tw-concept .tw-why {
+            margin-top: auto;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 0.78rem;
+        }
+        .tw-concept .tw-why b { color: var(--primary); }
+        .tw-glossary {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 0.4rem 1rem;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            margin: 0.75rem 0 1rem;
+            color: var(--text-main);
+        }
+        .tw-glossary dt { font-weight: 700; color: var(--primary); }
+        .tw-glossary dd { margin: 0; color: var(--text-muted); }
+        .tw-sources {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 2rem;
+        }
+        .tw-sources strong { color: var(--text-main); }
+        @media (max-width: 560px) {
+            .tw-page { padding-left: 1rem; padding-right: 1rem; }
+            .tw-glossary { grid-template-columns: 1fr; }
+            .tw-glossary dd { margin-bottom: 0.4rem; }
+        }
     </style>
     <script src="config.js"></script>
 </head>
@@ -238,55 +351,52 @@
     <div class="app-container">
     <div class="tw-page">
         <div class="tw-hero">
-            <div class="tw-eyebrow">Digital Twin Research</div>
+            <div class="tw-eyebrow">Theory</div>
             <h1>Lithium Supply Chain Digital Twin</h1>
             <p class="tw-subtitle">
-                A simulation of the real supply chain behind every battery this Route Planner's EVs run on &mdash;
-                from brine extraction in Chile to a finished pack on the road in Rajasthan.
+                Every EV battery starts as salty water in Chile and ends up in a car in Rajasthan.
+                This project builds a computer copy of that journey so we can test
+                &ldquo;what if something goes wrong?&rdquo; without waiting for it to happen in real life.
             </p>
             <div class="tw-badge"><span class="tw-badge-dot"></span>Built on: EV Route Optimizer + Charging Station Network</div>
         </div>
 
-        <!-- What a digital twin is -->
+        <!-- 1. What a digital twin is -->
         <div class="tw-section">
+            <h2><span class="tw-num">1.</span>What is a digital twin?</h2>
             <p>
-                A digital twin is not just another dashboard. A dashboard shows charts of what already
-                happened. A digital twin is a running model that mirrors a physical system closely enough
-                that you can ask it "what if this part of the chain breaks?" and trust the answer. That
-                takes three things together: a state that stays in sync with the real system (actual
-                inventory levels and shipment positions, not stale averages), behavior models that can
-                predict what happens next (mass balance, inventory dynamics, disruption risk), and a
-                feedback loop, so a decision made using the twin can actually change the real system &mdash;
-                a scenario run here becomes a real procurement or routing decision.
+                Think of it like a <strong>flight simulator, but for a supply chain</strong>. Pilots practise
+                engine failures in a simulator so they know what to do in a real plane. In the same way, we can
+                &ldquo;break&rdquo; a part of the lithium chain in the twin &mdash; a mine shuts down, a ship is
+                delayed &mdash; and watch what happens to battery supply weeks later.
+            </p>
+            <p>
+                A normal dashboard only shows what <em>already</em> happened. A digital twin can also show what
+                <em>will probably</em> happen next. To do that it needs three things:
             </p>
 
             <div class="tw-card-grid">
                 <div class="tw-card">
                     <div class="tw-card-eyebrow">01 / STATE</div>
-                    <h4>Synchronized State</h4>
-                    <p>Reflects the current condition of the physical system, not historical averages.</p>
+                    <h4>A copy of today</h4>
+                    <p>It knows how much stock each factory holds and what is on the way right now.</p>
                 </div>
                 <div class="tw-card">
                     <div class="tw-card-eyebrow">02 / BEHAVIOR</div>
-                    <h4>Behavior Models</h4>
-                    <p>Mathematical models that predict what happens next, not just what already happened.</p>
+                    <h4>Rules for tomorrow</h4>
+                    <p>Simple maths rules that predict how stock, orders and shipments will change next week.</p>
                 </div>
                 <div class="tw-card">
                     <div class="tw-card-eyebrow">03 / FEEDBACK</div>
-                    <h4>Feedback Loops</h4>
-                    <p>A decision made using the twin can change the physical system &mdash; the loop closes.</p>
+                    <h4>Decisions go back</h4>
+                    <p>What we learn from the twin (e.g. &ldquo;order earlier&rdquo;) can be used to change the real chain.</p>
                 </div>
             </div>
-
-            <p>
-                This project builds toward that for one real chain: the lithium battery supply chain that
-                feeds the EVs this platform routes &mdash; explained next, followed by the concepts that make
-                the Analyze tab's scenarios behave like the real thing instead of a toy.
-            </p>
         </div>
 
-        <!-- The real lithium supply chain -->
+        <!-- 2. The real lithium supply chain -->
         <div class="tw-section">
+            <h2><span class="tw-num">2.</span>Where does a battery&rsquo;s lithium come from?</h2>
             <div class="tw-pipeline">
                 <div class="tw-pipe-stage">
                     <div class="tw-pipe-icon">🧂</div>
@@ -325,82 +435,105 @@
                 </div>
             </div>
 
-            <p>
-                Lithium for an EV battery crosses three continents and several industrial stages before it
-                ever reaches a car in Rajasthan, and each stage is a real physical bottleneck, which is why a
-                disruption anywhere in this chain is worth taking seriously. It starts as brine pumped from
-                underground reservoirs beneath Chile's Atacama salt flats into shallow evaporation ponds, where
-                sun and wind concentrate it over many months &mdash; a slow step, highly dependent on weather
-                and water availability, so a drought here is a real, documented risk. The concentrated brine is
-                then shipped and refined into battery-grade lithium carbonate or hydroxide, almost entirely in
-                China, which processes roughly two-thirds of the world's lithium chemicals regardless of where
-                it was mined (IEA Critical Minerals Report, 2022) &mdash; the single biggest geographic
-                concentration risk in the whole chain. From there the refined lithium becomes cathode precursor
-                material and is assembled into battery cells, still largely in China at the scale of
-                CATL-class manufacturers, before the cells travel to India to be assembled into complete,
-                safety-tested battery packs &mdash; a mechanical, near-lossless step (around 99% yield; Dunn
-                et al. 2021, <em>Joule</em>). Finished packs then go to the OEM that builds the EVs this
-                platform routes, and are distributed out to warehouses and dealers across Rajasthan's regions
-                &mdash; Jaipur, Jodhpur, Udaipur, and the rest. Finally, end-of-life batteries feed back into
-                the chain through hydrometallurgical recycling, recovering roughly 72% of the lithium content
-                (Harper et al. 2019, <em>Nature</em>) &mdash; real, but not full recovery, which is why new
-                mining stays necessary even as recycling scales up.
-            </p>
+            <p>The lithium crosses three continents before it reaches a car. Here is each step in one line:</p>
+            <ol class="tw-steps">
+                <li><strong>Extraction (Chile)</strong> &mdash; Salty underground water (brine) is pumped into ponds
+                    and left in the sun for months until the lithium is concentrated. A drought here slows everything.</li>
+                <li><strong>Processing (China)</strong> &mdash; The concentrate is refined into battery-grade lithium.
+                    About two-thirds of the world&rsquo;s lithium is refined in China, so this is the biggest single risk point.</li>
+                <li><strong>Cell manufacturing (China)</strong> &mdash; The refined lithium is turned into cathode material
+                    and then into individual battery cells.</li>
+                <li><strong>Pack assembly (India)</strong> &mdash; Cells are put together into complete, safety-tested battery packs.</li>
+                <li><strong>OEM &amp; regions (Rajasthan)</strong> &mdash; The car maker fits the packs into EVs, which are sent
+                    to warehouses and dealers in Jaipur, Jodhpur, Udaipur and other regions.</li>
+                <li><strong>Recycling</strong> &mdash; Old batteries are recycled and some lithium goes back into the chain.
+                    We get back only about 72%, so new mining is still needed.</li>
+            </ol>
 
             <div class="tw-callout">
-                Every yield-loss number in this twin (90% at extraction/processing, 95% at precursor
-                manufacturing, 96% at cell manufacturing, 99% at assembly, 72% recycling recovery) is a sourced
-                figure, not a guess &mdash; see below for how they're actually used in the simulation.
+                <strong>Some material is lost at every step.</strong> Out of 100&nbsp;kg going in, roughly
+                90&nbsp;kg survives extraction &amp; processing, 95&nbsp;kg survives precursor making,
+                96&nbsp;kg survives cell making and 99&nbsp;kg survives pack assembly. Recycling recovers about
+                72&nbsp;kg. These numbers come from published research (sources at the bottom of the page).
             </div>
         </div>
 
-        <!-- Concepts used in Analyze -->
+        <!-- 3. Concepts used in Analyze -->
         <div class="tw-section">
+            <h2><span class="tw-num">3.</span>The ideas behind the Analyze tab</h2>
             <p>
-                Everything the Analyze tab shows you comes from a handful of supply chain concepts working
-                together, and all of them exist for a reason. <strong>Mass balance and yield loss</strong> is
-                the simplest: every node in the chain only turns part of what it receives into usable output
-                (brine extraction and processing at about 90%, precursor manufacturing at about 95%, cell
-                manufacturing at about 96%, pack assembly at about 99%, recycling recovery at about 72% --
-                IEA 2022/2023, Bloomberg 2022, Dunn et al. 2021, Harper et al. 2019), so the model never lets
-                material appear or vanish for free; it's why a capacity cut at one stage doesn't translate
-                into an equal-sized cut downstream, and why the Analyze tab's numbers are trustworthy rather
-                than just illustrative. On top of that, every node reorders from its supplier using a
-                <strong>base-stock policy with safety stock</strong>, sized against its own demand, its own
-                lead time, and the service level it's targeting, and orders are smoothed rather than jumping
-                straight to the target level (the APIOBPCS rule, Dejonckheere, Disney, Lambrecht &amp; Towill
-                2003) -- this is what gives you a realistic, gradually-adjusting inventory picture instead of
-                a chain that overreacts to every blip, and it's what the live policy table below is actually
-                showing. That same local, imperfect-information behavior is also what produces the
-                <strong>bullwhip effect</strong> -- order variability amplifying as it moves upstream (Lee,
-                Padmanabhan &amp; Whang 1997) -- which matters because it's the reason a small, short-lived
-                shock near the customer end can still cause a large, long-lived swing further up the chain.
-                To actually create a shock to study, the model uses <strong>disruption modeling</strong>: a
-                generic spec that temporarily cuts one parameter of one node or shipment link for a fixed
-                duration and then restores it, compared against a matched baseline run with the same random
-                demand, so any difference you see is attributable to the disruption itself and not to noise.
-                Because any single run is just one roll of the dice, the Analyze tab also runs the same
-                scenario many times with different, realistic random demand -- <strong>Monte Carlo risk
-                analysis</strong> -- so instead of one number you get a believable range, including how bad
-                the worst-case trials get, which is the whole point of the risk-analysis card you see after
-                running a scenario. A separate <strong>centralized optimization benchmark</strong> (a linear
-                program solved with PuLP) then asks what the best possible outcome would be if one planner
-                had perfect visibility and foresight over the whole chain, under the same physical limits --
-                comparing that to the simulated result tells you how much of the shortfall is simply the cost
-                of nodes making decentralized decisions with incomplete information, rather than the
-                disruption itself. Finally, because demand isn't one single national number, <strong>regional
-                demand disaggregation</strong> splits it across Rajasthan's real regions, weighted by each
-                region's actual warehouse capacity, which is exactly why the map on the Analyze tab can tell
-                you which specific region would be hit hardest rather than only giving you one national
-                average.
+                The Analyze tab uses a few standard supply chain ideas. Each card below explains one idea in
+                plain words and why it matters for the results you see.
             </p>
+
+            <div class="tw-concepts">
+                <div class="tw-concept">
+                    <div class="tw-tag">Idea 1</div>
+                    <h4>Mass balance &amp; yield loss</h4>
+                    <p>Material can&rsquo;t appear from nowhere or disappear for free. Each stage only turns part of
+                        its input into output (the percentages above).</p>
+                    <p class="tw-why"><b>Why it matters:</b> a 20% cut at one stage doesn&rsquo;t mean exactly 20% fewer
+                        batteries at the end &mdash; the losses add up along the way.</p>
+                </div>
+                <div class="tw-concept">
+                    <div class="tw-tag">Idea 2</div>
+                    <h4>Reorder rule &amp; safety stock</h4>
+                    <p>Each stage keeps a target stock level, like a shop that refills its shelves. It also keeps a
+                        little extra (safety stock) in case demand is higher than expected or a shipment is late.
+                        Orders are adjusted gradually, not all at once.</p>
+                    <p class="tw-why"><b>Why it matters:</b> it gives a realistic picture of stock rising and falling,
+                        and it&rsquo;s what the table at the bottom of this page shows.</p>
+                </div>
+                <div class="tw-concept">
+                    <div class="tw-tag">Idea 3</div>
+                    <h4>Bullwhip effect</h4>
+                    <p>A small change in customer demand becomes a bigger change in orders at each step up the chain
+                        &mdash; like cracking a whip, where a small flick of the wrist makes a big wave at the tip.</p>
+                    <p class="tw-why"><b>Why it matters:</b> a small, short shock near the customer can cause a big,
+                        long swing at the mine and refinery.</p>
+                </div>
+                <div class="tw-concept">
+                    <div class="tw-tag">Idea 4</div>
+                    <h4>Disruption scenarios</h4>
+                    <p>We &ldquo;break&rdquo; one part of the chain for a while (e.g. cut refinery capacity by half for
+                        8 weeks), then fix it. We run the same weeks again with nothing broken and compare the two.</p>
+                    <p class="tw-why"><b>Why it matters:</b> because everything else is identical, any difference
+                        is caused by the disruption, not by chance.</p>
+                </div>
+                <div class="tw-concept">
+                    <div class="tw-tag">Idea 5</div>
+                    <h4>Monte Carlo risk analysis</h4>
+                    <p>Real demand is random, so one run is like one roll of a dice. We run the same scenario many
+                        times with different random demand and look at the full range of results.</p>
+                    <p class="tw-why"><b>Why it matters:</b> you see the typical outcome <em>and</em> how bad the worst
+                        cases can get &mdash; that&rsquo;s the risk card on the Analyze tab.</p>
+                </div>
+                <div class="tw-concept">
+                    <div class="tw-tag">Idea 6</div>
+                    <h4>Best-case benchmark</h4>
+                    <p>We also calculate the best possible result if one planner could see the whole chain and knew
+                        the future (solved with linear programming in PuLP).</p>
+                    <p class="tw-why"><b>Why it matters:</b> the gap between this and the simulation shows how much
+                        loss comes from stages not sharing information, not from the disruption itself.</p>
+                </div>
+                <div class="tw-concept">
+                    <div class="tw-tag">Idea 7</div>
+                    <h4>Regional demand split</h4>
+                    <p>Demand isn&rsquo;t one number for the whole state. We split it across Rajasthan&rsquo;s regions
+                        based on how much warehouse space each region has.</p>
+                    <p class="tw-why"><b>Why it matters:</b> the map on the Analyze tab can tell you <em>which</em>
+                        region gets hit hardest, not just a single average.</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Live model data -->
+        <!-- 4. Live model data -->
         <div class="tw-section">
+            <h2><span class="tw-num">4.</span>The model, live</h2>
             <p>
-                The topology below is the chain exactly as the model sees it, read live from the running
-                model rather than retyped from a spreadsheet, so it can't drift out of sync with it.
+                Below is the chain exactly as the running model sees it. These numbers are loaded straight from
+                the model, so they always match what the simulation uses. Each card shows a stage&rsquo;s yield
+                and how much it can produce per week; the arrows show how many weeks shipping takes.
             </p>
             <div class="topo-strip" id="topology-diagram">
                 <p style="color: var(--text-muted); font-size: 0.8rem;">Loading live topology&hellip;</p>
@@ -408,11 +541,11 @@
 
             <div class="calib-row">
                 <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-color); padding: 1rem;">
-                    <p class="stat-label">National Demand Mean</p>
+                    <p class="stat-label">Average Weekly Demand</p>
                     <p class="stat-value" id="demand-mean-stat" style="font-size:1.1rem;">&ndash;</p>
                 </div>
                 <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-color); padding: 1rem;">
-                    <p class="stat-label">Demand CV</p>
+                    <p class="stat-label">Demand Variability (CV)</p>
                     <p class="stat-value" id="demand-cv-stat" style="font-size:1.1rem;">&ndash;</p>
                 </div>
                 <div class="stat-card" style="box-shadow:none; border:1px solid var(--border-color); padding: 1rem;">
@@ -420,6 +553,15 @@
                     <p class="stat-value" id="service-level-stat" style="font-size:1.1rem;">&ndash;</p>
                 </div>
             </div>
+
+            <p style="margin-bottom:0.25rem;">How to read the table:</p>
+            <dl class="tw-glossary">
+                <dt>Demand Mean</dt><dd>How much lithium (in kg LCE) this stage needs on an average week.</dd>
+                <dt>Lead Time</dt><dd>How many weeks it takes for an order to arrive.</dd>
+                <dt>Safety Stock</dt><dd>Extra stock kept aside in case demand jumps or a shipment is late.</dd>
+                <dt>Base-Stock Level (S)</dt><dd>The target stock level the stage tries to refill up to.</dd>
+                <dt>kg LCE</dt><dd>Lithium Carbonate Equivalent &mdash; a common unit so every stage is measured the same way.</dd>
+            </dl>
 
             <table id="policy-table">
                 <thead>
@@ -431,6 +573,16 @@
             </table>
 
             <a class="dashboard-link" href="supply-chain.html">Try a scenario and see all of this live on Analyze &rarr;</a>
+        </div>
+
+        <div class="tw-sources">
+            <strong>Sources:</strong>
+            IEA Global Critical Minerals Outlook (2022/2023) &middot;
+            Bloomberg NEF (2022) &middot;
+            Dunn et al. (2021), <em>Joule</em> &middot;
+            Harper et al. (2019), <em>Nature</em> &middot;
+            Lee, Padmanabhan &amp; Whang (1997), bullwhip effect &middot;
+            Dejonckheere, Disney, Lambrecht &amp; Towill (2003), APIOBPCS ordering rule.
         </div>
 
     </div>
